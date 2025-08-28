@@ -20,7 +20,16 @@ const app = express();
 
 // Logging middleware
 app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.ip} opened ${req.originalUrl}`);
+  const skip = [
+    ".css", ".js", ".png", ".jpg", ".jpeg", ".gif", ".svg", ".ico", ".webp",
+    ".woff", ".woff2", ".ttf", ".map"
+  ];
+
+  if (!skip.some(ext => req.originalUrl.includes(ext))) {
+    const timestamp = new Date().toLocaleString("en-US", { timeZone: "America/New_York" });
+    console.log(`[${timestamp}] ${req.ip} opened ${req.originalUrl}`);
+  }
+
   next();
 });
 
