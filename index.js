@@ -20,10 +20,13 @@ const app = express();
 
 // Logging middleware
 app.use((req, res, next) => {
-  // Timestamp in Eastern Time
   const timestamp = new Date().toLocaleString("en-US", { timeZone: "America/New_York" });
 
-  // Determine if request is for a static file
+  // Skip health check / version.json requests
+  if (req.originalUrl.includes("version.stable.json")) {
+    return next();
+  }
+
   const staticExts = [
     ".css", ".js", ".png", ".jpg", ".jpeg",
     ".gif", ".svg", ".ico", ".webp", ".woff",
@@ -32,7 +35,6 @@ app.use((req, res, next) => {
   const isStatic = staticExts.some(ext => req.originalUrl.includes(ext));
   const type = isStatic ? "STATIC" : "DYNAMIC";
 
-  // Get real client IP if behind a proxy (Railway, Render, etc.)
   const realIp = req.headers["x-forwarded-for"] || req.ip;
 
   console.log(`[${timestamp}] [${type}] ${realIp} opened ${req.originalUrl}`);
