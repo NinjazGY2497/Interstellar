@@ -6,9 +6,9 @@ const observer = new MutationObserver(() => {
     // Force the tab title
     document.title = "Home";
 
-    // Force the favicon
+    // Force the favicon to Google Classroom
     let link = document.querySelector("link[rel~='icon']");
-    if (link) link.href = "/assets/icons/google-classroom.ico";
+    if (link) link.href = "https://ssl.gstatic.com/classroom/favicon.ico";
 });
 
 // Attach observer to document
