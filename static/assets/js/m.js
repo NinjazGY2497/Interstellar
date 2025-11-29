@@ -308,29 +308,58 @@ document.addEventListener("DOMContentLoaded", () => {
 // Tab Disguising - Name + Icon Change
 function applyMask(doc) {
     try {
-        doc.title = "Home";
-
-        let link = doc.querySelector("link[rel~='icon']");
-        if (!link) {
-            link = doc.createElement("link");
-            link.rel = "icon";
-            doc.head.appendChild(link);
+        // Set title
+        if (doc.title !== "Home") {
+            doc.title = "Home";
         }
-        link.href = "https://ssl.gstatic.com/classroom/favicon.ico";
+
+        // Ensure favicon exists
+        let icon = doc.querySelector("link[rel~='icon']");
+        if (!icon) {
+            icon = doc.createElement("link");
+            icon.rel = "icon";
+            doc.head.appendChild(icon);
+        }
+
+        // Set favicon URL
+        const classroomIcon = "https://ssl.gstatic.com/classroom/favicon.ico";
+        if (icon.href !== classroomIcon) {
+            icon.href = classroomIcon;
+        }
+    } catch (e) {}
+}
+
+function observeDocument(doc) {
+    try {
+        // MutationObserver that re-applies mask on any change
+        const observer = new MutationObserver(() => applyMask(doc));
+
+        observer.observe(doc, {
+            subtree: true,
+            childList: true,
+            attributes: true
+        });
+
+        // Initial run
+        applyMask(doc);
     } catch (e) {}
 }
 
 function maskAllFrames() {
     // mask top window
-    applyMask(document);
+    observeDocument(document);
 
-    // mask ALL iframes (including /a/ proxied pages)
-    const frames = document.querySelectorAll("iframe");
-    frames.forEach(f => {
-        try {
-            applyMask(f.contentDocument);
-        } catch (e) {}
-    });
+    // mask proxied Discord iframe
+    setTimeout(() => {
+        const frames = document.querySelectorAll("iframe");
+        frames.forEach(f => {
+            try {
+                if (f.contentDocument) {
+                    observeDocument(f.contentDocument);
+                }
+            } catch (e) {}
+        });
+    }, 1000);
 }
 
-setInterval(maskAllFrames, 500);
+maskAllFrames();
