@@ -109,24 +109,17 @@ class UVServiceWorker extends EventEmitter {
             break;
           case "iframe":
           case "document":
-            if (isHtml(t.meta.url, c.headers["content-type"] || "")) {
-              c.body = t.rewriteHtml(await a.text(), {
-                document: true,
+            isHtml(t.meta.url, c.headers["content-type"] || "") &&
+              (c.body = t.rewriteHtml(await a.text(), {
+                document: !0,
                 injectHead: t.createHtmlInject(
                   this.config.handler,
                   this.config.bundle,
                   this.config.config,
-                  t.cookie.serialize(s, t.meta, true),
+                  t.cookie.serialize(s, t.meta, !0),
                   e.referrer,
                 ),
-              });
-          
-              // ✅ Inject tabcloak.js before </body>
-              c.body = c.body.replace(
-                /<\/body>/i,
-                '<script src="/assets/js/tabcloak.js"></script></body>'
-              );
-            }
+              }));
         }
       return (
         "text/event-stream" === n.headers.accept &&
