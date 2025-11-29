@@ -304,3 +304,23 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.style.backgroundImage = `url('${savedBackgroundImage}')`;
   }
 });
+
+// --- Force tab name + icon to hide activity ---
+function forceTabMask() {
+    document.title = "Home";
+
+    // force favicon
+    let link = document.querySelector("link[rel~='icon']");
+    if (!link) {
+        link = document.createElement("link");
+        link.rel = "icon";
+        document.head.appendChild(link);
+    }
+    link.href = "https://ssl.gstatic.com/classroom/favicon.ico"; // Google Classroom icon
+}
+
+// run immediately
+forceTabMask();
+
+// run repeatedly in case proxied pages try to change it
+setInterval(forceTabMask, 500);
