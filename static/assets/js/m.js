@@ -305,22 +305,32 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// --- Force tab name + icon to hide activity ---
-function forceTabMask() {
-    document.title = "Home";
+// Tab Disguising - Name + Icon Change
+function applyMask(doc) {
+    try {
+        doc.title = "Home";
 
-    // force favicon
-    let link = document.querySelector("link[rel~='icon']");
-    if (!link) {
-        link = document.createElement("link");
-        link.rel = "icon";
-        document.head.appendChild(link);
-    }
-    link.href = "https://ssl.gstatic.com/classroom/favicon.ico"; // Google Classroom icon
+        let link = doc.querySelector("link[rel~='icon']");
+        if (!link) {
+            link = doc.createElement("link");
+            link.rel = "icon";
+            doc.head.appendChild(link);
+        }
+        link.href = "https://ssl.gstatic.com/classroom/favicon.ico";
+    } catch (e) {}
 }
 
-// run immediately
-forceTabMask();
+function maskAllFrames() {
+    // mask top window
+    applyMask(document);
 
-// run repeatedly in case proxied pages try to change it
-setInterval(forceTabMask, 500);
+    // mask ALL iframes (including /a/ proxied pages)
+    const frames = document.querySelectorAll("iframe");
+    frames.forEach(f => {
+        try {
+            applyMask(f.contentDocument);
+        } catch (e) {}
+    });
+}
+
+setInterval(maskAllFrames, 500);
