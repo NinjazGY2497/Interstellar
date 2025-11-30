@@ -1,4 +1,5 @@
 // Ads
+// settings.js
 document.addEventListener("DOMContentLoaded", () => {
   function adChange(selectedValue) {
     if (selectedValue === "default") {
@@ -65,10 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const storedP = localStorage.getItem("uv");
     if (storedP === "true") {
       pChangeElement.value = "uv";
-    } else if (
-      localStorage.getItem("dy") === "true" ||
-      localStorage.getItem("dy") === "auto"
-    ) {
+    } else if (localStorage.getItem("dy") === "true" || localStorage.getItem("dy") === "auto") {
       pChangeElement.value = "dy";
     } else {
       pChangeElement.value = "uv";
@@ -113,9 +111,7 @@ function saveEventKey() {
 const dropdown = document.getElementById("dropdown");
 const options = dropdown.getElementsByTagName("option");
 
-const sortedOptions = Array.from(options).sort((a, b) =>
-  a.textContent.localeCompare(b.textContent),
-);
+const sortedOptions = Array.from(options).sort((a, b) => a.textContent.localeCompare(b.textContent));
 
 while (dropdown.firstChild) {
   dropdown.removeChild(dropdown.firstChild);
@@ -162,11 +158,18 @@ function ResetCustomCloak() {
 function redirectToMainDomain() {
   const currentUrl = window.location.href;
   const mainDomainUrl = currentUrl.replace(/\/[^\/]*$/, "");
+  const target = mainDomainUrl + window.location.pathname;
   if (window !== top) {
-    top.location.href = mainDomainUrl + window.location.pathname;
-  } else {
-    window.location.href = mainDomainUrl + window.location.pathname;
-  }
+    try {
+      top.location.href = target;
+    } catch {
+      try {
+        parent.location.href = target;
+      } catch {
+        window.location.href = target;
+      }
+    }
+  } else window.location.href = mainDomainUrl + window.location.pathname;
 }
 
 document.addEventListener("DOMContentLoaded", event => {
@@ -262,9 +265,7 @@ function AB() {
       const link = doc.createElement("link");
 
       const name = localStorage.getItem("name") || "My Drive - Google Drive";
-      const icon =
-        localStorage.getItem("icon") ||
-        "https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png";
+      const icon = localStorage.getItem("icon") || "https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png";
 
       doc.title = name;
       link.rel = "icon";
@@ -363,6 +364,73 @@ function getRandomURL() {
 
 function randRange(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
+}
+
+function exportSaveData() {
+  function getCookies() {
+    const cookies = document.cookie.split("; ");
+    const cookieObj = {};
+    cookies.forEach(cookie => {
+      const [name, value] = cookie.split("=");
+      cookieObj[name] = value;
+    });
+    return cookieObj;
+  }
+  function getLocalStorage() {
+    const localStorageObj = {};
+    for (const key in localStorage) {
+      if (localStorage.hasOwnProperty(key)) {
+        localStorageObj[key] = localStorage.getItem(key);
+      }
+    }
+    return localStorageObj;
+  }
+  const data = {
+    cookies: getCookies(),
+    localStorage: getLocalStorage(),
+  };
+  const dataStr = JSON.stringify(data, null, 2);
+  const blob = new Blob([dataStr], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "save_data.json";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function importSaveData() {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "application/json";
+  input.onchange = event => {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const data = JSON.parse(e.target.result);
+        if (data.cookies) {
+          Object.entries(data.cookies).forEach(([key, value]) => {
+            document.cookie = `${key}=${value}; path=/`;
+          });
+        }
+        if (data.localStorage) {
+          Object.entries(data.localStorage).forEach(([key, value]) => {
+            localStorage.setItem(key, value);
+          });
+        }
+        alert("Your save data has been imported. Please test it out.");
+        alert("If you find any issues then report it in GitHub or the Interstellar Discord.");
+      } catch (error) {
+        console.error("Error parsing JSON file:", error);
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
 }
 function exportSaveData() {
   function getCookies() {

@@ -1,6 +1,6 @@
 <div align="center">
     <img src="https://raw.githubusercontent.com/UseInterstellar/Interstellar/main/.github/branding/in.png">
-    <p>Serving over 8+ million users since 2023.<p>
+    <p>Serving over 15 million users since 2022.<p>
     <p>Interstellar is a web proxy with a Clean and Sleek UI and easy to use menus. Our goal is to provide the best user experience to everyone.</p>
 </div>
 
@@ -112,7 +112,8 @@ As of January 1st, 2024, Replit is [no longer free](https://blog.replit.com/host
 3. In the terminal at the bottom, paste `pnpm i && pnpm start`.
 4. Respond to the application popup by clicking "Make public."
 > [!IMPORTANT]
-> Make sure you click the "Make public." button, or the proxy won't function properly.
+> Make sure you click the "Make public." button, or the proxy won't function properly.<br>
+> If you get a Range Error, go back and make sure you clicked Make public!
 5. Access the deployed website from the ports tab.
 6. For subsequent uses in the same codespace, just run `pnpm start`
 
